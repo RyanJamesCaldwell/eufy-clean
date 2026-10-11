@@ -196,11 +196,11 @@ class TuyaCloudClient:
         # Sign the request
         params["sign"] = self._sign(params)
 
+        # Query parameters and signing inputs contain credentials; never log them.
         session = self._websession
         async with session.get(
             self.endpoint, params=params, timeout=_REQUEST_TIMEOUT
         ) as resp:
-            _LOGGER.debug("Tuya request actual URL: %s", resp.url)
             body = await resp.json(content_type=None)
 
         if body.get("success") is False:
@@ -275,7 +275,6 @@ class TuyaCloudClient:
                 parts.append(f"{key}={value}")
 
         sign_str = "||".join(parts)
-        _LOGGER.debug("Tuya sign string: %s", sign_str)
         return _hmac_sign(self._hmac_key, sign_str)
 
 
